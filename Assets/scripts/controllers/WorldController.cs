@@ -9,10 +9,14 @@ public class WorldController : MonoBehaviour {
 	public int width = 20;
 	public int height = 20;
 
-	List<GameObject> characters;
+	Dictionary<Character, GameObject> characters;
+	Dictionary<Supply, GameObject> supplyGameObjects;
+
+	float deliveryTimer = 3f;
 
 	void OnEnable() {
-		characters = new List<GameObject>();
+		characters = new Dictionary<Character, GameObject>();
+		supplyGameObjects = new Dictionary<Supply, GameObject>();
 
 		if(Instance != null) {
 			Debug.LogError("There should never be two world controllers.");
@@ -33,7 +37,14 @@ public class WorldController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		// TEMP -> move to SupplyManager
+		if (deliveryTimer > 0) {
+			deliveryTimer -= Time.deltaTime;
+		} else {
+			deliverSupplies();
+			deliveryTimer = 3f;
+		}
 	}
 
 	void onTileChanged(Tile tile) {
@@ -41,6 +52,7 @@ public class WorldController : MonoBehaviour {
 	}
 
 	void onCharacterSpawned(Character c) {
+		// TEMP
 		string prefab = "prefabs/worker_"+Random.Range(1,3);
 //		if (c.weight > 90) {
 //			prefab = "prefabs/character_3";
@@ -48,8 +60,45 @@ public class WorldController : MonoBehaviour {
 
 		GameObject charGO = (GameObject)Instantiate(Resources.Load(prefab));
 		charGO.transform.position = new Vector3(c.currTile.x+0.5f, c.currTile.y+0.5f, 0f);
-		charGO.GetComponent<CharacterMove>().setCharacter(c); 
+		charGO.GetComponent<WorkerController>().setCharacter(c); 
 
-		characters.Add(charGO);
+		c.registerPickupSupplyCallback(pickupSupply);
+		c.registerSupplyUsedCallback(supplyUsed);
+
+		characters.Add(c, charGO);
+	}
+
+	// TEMP box spawn
+	void deliverSupplies() {
+		if (world.jobQueue.pendingJobs.Count > 0) {
+			foreach (var job in world.jobQueue.pendingJobs.ToArray()) {
+				if (job.supply != null) {
+					Tile tile = world.getEmptyTile();
+
+					GameObject supGO= new GameObject();
+					supGO.transform.SetParent(this.transform);
+					supGO.transform.position = new Vector3(tile.x+0.5f, tile.y+0.5f, 0);
+					SpriteRenderer supSR = supGO.AddComponent<SpriteRenderer>();
+					supSR.sprite = Resources.Load<Sprite>("sprites/supply/box");
+
+					supplyGameObjects.Add(job.supply, supGO);
+
+					job.supply.setTile(tile);
+				}
+			}
+		}
+	}
+
+	void pickupSupply(Character c) {
+		GameObject supGO = supplyGameObjects[c.job.supply];
+		supGO.transform.SetParent(characters[c].transform);
+		supGO.transform.localPosition = new Vector3(0, 0.45f, 0);
+		supGO.GetComponent<SpriteRenderer>().sortingOrder = 1;
+	}
+
+	void supplyUsed(Character c) {
+		GameObject supGO = supplyGameObjects[c.job.supply];
+		supplyGameObjects.Remove(c.job.supply);
+		Destroy(supGO);
 	}
 }

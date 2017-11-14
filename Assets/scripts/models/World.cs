@@ -13,6 +13,8 @@ public class World {
 
 	public List<Character> chars;
 
+	public JobQueue jobQueue;
+
 	Action<Tile> cbTileChanged;
 	Action<Character> cbCharacterSpawned;
 
@@ -38,6 +40,7 @@ public class World {
 		}
 
 		chars = new List<Character>();
+		jobQueue = new JobQueue();
 	}
 
 	void invalidateTileGraph() {
@@ -69,6 +72,17 @@ public class World {
 
 		if (cbCharacterSpawned != null)
 			cbCharacterSpawned(c);
+	}
+
+	public Tile getEmptyTile() {
+		int x = UnityEngine.Random.Range(1, width);
+		int y = UnityEngine.Random.Range(1, height);
+
+		Tile tile = getTileAt(x, y);
+		if (tile.movementCost == 0 || tile.hasPendingJob)
+			tile = getEmptyTile();
+
+		return tile;
 	}
 
 	// ===== Callbacks =====

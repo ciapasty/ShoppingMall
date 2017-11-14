@@ -27,11 +27,12 @@ public class MouseController : MonoBehaviour {
 
 		Tile overTile = wc.world.getTileAtPosition(currFramePosition);
 
-		//debug(overTile);
+		debug(overTile);
+
 		if (!EventSystem.current.IsPointerOverGameObject()) { // UI elements getting the hit/hover
 			if (Input.GetMouseButtonDown(0)) {
 				if (bmc.isBuildModeEnabled == true) {
-					overTile.type = bmc.buildType;
+					bmc.doBuild(overTile);
 				}
 			}
 		}
@@ -66,29 +67,29 @@ public class MouseController : MonoBehaviour {
 	// ===== DEBUG =====
 
 	void debug(Tile overTile) {
-		// DEBUG
-		if (Input.GetMouseButtonDown(0)) {
-			if (wc.world.chars.Count > 0) {
-				foreach (var c in wc.world.chars) {
-					c.setDestination(overTile);
-				}
-			} else {
-				Debug.Log("No character spawned!");
-			}
-		}
-
-		// DEBUG -> temporary wall building
-		if (Input.GetKeyDown(KeyCode.W)) {
-			if (overTile.type == TileType.floor) {
-				overTile.type = TileType.wall;
-				return;
-			}
-
-			if (overTile.type == TileType.wall) {
-				overTile.type = TileType.floor;
-				return;
-			}
-		}
+//		// DEBUG
+//		if (Input.GetMouseButtonDown(0)) {
+//			if (wc.world.chars.Count > 0) {
+//				foreach (var c in wc.world.chars) {
+//					c.setDestination(overTile);
+//				}
+//			} else {
+//				Debug.Log("No character spawned!");
+//			}
+//		}
+//
+//		// DEBUG -> temporary wall building
+//		if (Input.GetKeyDown(KeyCode.W)) {
+//			if (overTile.type == TileType.floor) {
+//				overTile.type = TileType.wall;
+//				return;
+//			}
+//
+//			if (overTile.type == TileType.wall) {
+//				overTile.type = TileType.floor;
+//				return;
+//			}
+//		}
 
 		// DEBUG -> Spawn new character
 		if (Input.GetKeyDown(KeyCode.C)) {

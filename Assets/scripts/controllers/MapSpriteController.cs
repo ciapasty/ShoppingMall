@@ -69,7 +69,7 @@ public class MapSpriteController : MonoBehaviour {
 
 	public void updateTileGraphics(Tile tile) {
 		foreach (var t in tile.getNeighbours()) {
-			if (t.type == tile.type)
+//			if (t.type == tile.type)
 				redrawTile(t);
 		}
 

@@ -26,7 +26,7 @@ GameObject:
   - component: {fileID: 114934451853219768}
   m_Layer: 0
   m_Name: worker_2
-  m_TagString: Untagged
+  m_TagString: Character
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -104,11 +104,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1653066382990042}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: deb4b174025324fb1ac3acb3917ec829, type: 3}
+  m_Script: {fileID: 11500000, guid: 53264a6943db44e9ea0b2c47534585d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceRate: 1000
-  _randomForceFactor: 8
 --- !u!212 &212064012340968526
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -30,6 +30,9 @@ public class Tile {
 		get {
 			switch (type) {
 			case TileType.floor:
+				if (hasSupply) {
+					return 2f;
+				}
 				return 1f;
 			case TileType.empty:
 				goto case TileType.wall;
@@ -39,6 +42,9 @@ public class Tile {
 			return 0f;
 		}
 	}
+
+	public bool hasPendingJob = false;
+	public bool hasSupply = false;
 
 	Action<Tile> cbTileChanged;
 
