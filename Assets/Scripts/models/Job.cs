@@ -43,20 +43,14 @@ public class Job {
 		}
 	}
 
-	public void registerSupplyReadyCallback(Action<Job> callback) {
+	// ===== Callback =====
+
+	public void registerSupplyDeliveredCallback(Action<Job> callback) {
 		cbSupplyReady += callback;
 	}
 
-	public void unregisterSupplyReadyCallback(Action<Job> callback) {
+	public void unregisterSupplyDeliveredCallback(Action<Job> callback) {
 		cbSupplyReady -= callback;
-	}
-
-	public void registerJobCancelledCallback(Action<Job> callback) {
-		cbJobCancelled += callback;
-	}
-
-	public void unregisterJobCancelledCallback(Action<Job> callback) {
-		cbJobCancelled -= callback;
 	}
 
 	public void registerJobFinishedCallback(Action<Job> callback) {
@@ -65,6 +59,14 @@ public class Job {
 
 	public void unregisterJobFinishedCallback(Action<Job> callback) {
 		cbJobFinished -= callback;
+	}
+
+	public void registerJobCancelledCallback(Action<Job> callback) {
+		cbJobCancelled += callback;
+	}
+
+	public void unregisterJobCancelledCallback(Action<Job> callback) {
+		cbJobCancelled -= callback;
 	}
 
 }

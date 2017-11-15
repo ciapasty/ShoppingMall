@@ -14,14 +14,14 @@ public class WorkerController : MonoBehaviour {
 
 	Animator anim;
 
-	public Character cr;
+	public Character character;
 
 	// Use this for initialization
 	void Start () {
 		wc = WorldController.Instance;
 
 		body = GetComponent<Rigidbody2D>();
-		body.mass = cr.weight;
+		body.mass = character.weight;
 
 		anim = GetComponent<Animator>();
 	}
@@ -50,17 +50,19 @@ public class WorkerController : MonoBehaviour {
 			}
 		}
 
-		if (cr.nextTile != null) {
-			body.AddForce((getMoveDirection(gameObject.transform.position, cr.nextTile)-(new Vector2(v.x, v.y)))*forceRate*cr.speed);
+		if (character.nextTile != null) {
+			Vector2 moveDirection = getMoveDirection(gameObject.transform.position, character.nextTile) - (new Vector2(v.x, v.y));
+			body.AddForce(moveDirection*forceRate*character.speed);
 		}
-		cr.updatePosition(wc.world.getTileAtPosition(gameObject.transform.position), Time.deltaTime);
+		Tile currTile = wc.world.getTileAtPosition(new Vector3(gameObject.transform.position.x, gameObject.transform.position.y+0.1f, 0));
+		character.updatePosition(currTile, Time.deltaTime);
 
 		if (body.velocity.magnitude > 0.5f) {
 			anim.SetFloat("speed", body.velocity.magnitude/3);
 		}
 
 		anim.SetBool("isWalking", (body.velocity.x != 0 || body.velocity.y != 0));
-		GetComponent<SpriteRenderer>().flipX = (body.velocity.x < -1f);
+		GetComponent<SpriteRenderer>().flipX = (body.velocity.x < -0.2f);
 	}
 
 	Vector2 getMoveDirection(Vector3 position, Tile tile2) {
@@ -75,6 +77,6 @@ public class WorkerController : MonoBehaviour {
 	}
 
 	public void setCharacter(Character c) {
-		cr = c;
+		character = c;
 	}
 }

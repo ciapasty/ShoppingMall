@@ -16,7 +16,7 @@ public class JobQueue {
 	}
 
 	public void enqueue(Job job) {
-		job.registerSupplyReadyCallback(supplyDelivered);
+		job.registerSupplyDeliveredCallback(supplyDelivered);
 		job.registerJobFinishedCallback(jobFinished);
 
 		pendingJobs.Add(job);
@@ -33,8 +33,13 @@ public class JobQueue {
 		availableJobs.Enqueue(job);
 	}
 
+	// Is this required??
 	void jobFinished(Job job) {
-		job.unregisterSupplyReadyCallback(supplyDelivered);
+		job.unregisterSupplyDeliveredCallback(supplyDelivered);
+	}
+
+	void jobAbandoned(Job job) {
+		availableJobs.Enqueue(job);
 	}
 }
 

@@ -16,6 +16,7 @@ public class Supply {
 
 	public void setTile(Tile t) {
 		tile = t;
+		tile.hasSupply = true;
 		if (cbSupplyDelivered != null) {
 			cbSupplyDelivered(this);
 		}

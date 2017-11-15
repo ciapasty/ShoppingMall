@@ -42,9 +42,19 @@ public class Tile {
 			return 0f;
 		}
 	}
+	public bool isWalkable {
+		get {
+			return (movementCost > 0);
+		}
+	}
 
 	public bool hasPendingJob = false;
 	public bool hasSupply = false;
+	public bool isBuildable {
+		get {
+			return !(hasPendingJob || hasSupply || (movementCost < 0));
+		}
+	}
 
 	Action<Tile> cbTileChanged;
 

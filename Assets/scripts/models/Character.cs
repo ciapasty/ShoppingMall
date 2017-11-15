@@ -21,6 +21,7 @@ public class Character {
 	public Job job { get; protected set; }
 	public bool hasSupply { get; protected set; }
 	Action<Character> cbPickupSupply;
+	Action<Character> cbDropSupply;
 	Action<Character> cbSupplyUsed;
 
 	public Character() {
@@ -36,6 +37,10 @@ public class Character {
 	public void setDestination(Tile tile) {
 		destTile = tile;
 		pathAStar = new Path_AStar(currTile.world, currTile, destTile);	// This will calculate a path from curr to dest.
+		if (pathAStar == null) {
+			// There is no path to destination
+			Debug.LogError("Character on tile: "+currTile.x+", "+currTile.y+" has no path to: "+destTile.x+", "+destTile.y);
+		}
 	}
 
 	public void spawnedAtTile(Tile tile) {
@@ -61,6 +66,7 @@ public class Character {
 					if (currTile == job.supply.tile) {
 						cbPickupSupply(this);
 						hasSupply = true;
+						job.supply.tile.hasSupply = false;
 					}
 					return;
 				} 
@@ -89,43 +95,40 @@ public class Character {
 		hasSupply = false;
 		this.job = null;
 
-		foreach (var tile in currTile.getNeighbours()) {
-			if (tile.movementCost > 0) {
-				setDestination(tile);
-				return;
-			}
-		}
+		destTile = nextTile = null;
 	}
 
 	void updateMovement(Tile tile, float deltaTime) {
-		if (currTile == nextTile || nextTile == null) {
-			if (pathAStar != null) {
-				if (pathAStar.Length() > 0) {
-					nextTile = pathAStar.Dequeue();
-					return;
+		if (destTile != null) {
+			if (currTile == nextTile || nextTile == null) {
+				if (pathAStar != null) {
+					if (pathAStar.Length() > 0) {
+						nextTile = pathAStar.Dequeue();
+						return;
+					}
 				}
 			}
-		}
 
-		if (currTile == destTile) {
-			nextTile = null;
-			pathAStar = null;
-
-			// Random walking
-			//			destTile = getRandomWalkableTile();
-			//			pathAStar = new Path_AStar(currTile.world, currTile, destTile);
-			return;
-		}
-
-		if (nextTile != null) {
-			float dist = Vector2.Distance(new Vector2(currTile.x, currTile.y), new Vector2(nextTile.x, nextTile.y));
-			if (dist > 1.42f || rerouteTimer <= 0 || nextTile.movementCost == 0) {
-				pathAStar = new Path_AStar(currTile.world, currTile, destTile);
-				nextTile = null;
-				rerouteTimer = 3f;
-			} else {
-				rerouteTimer -= deltaTime;
+			if (currTile == destTile) {
+				destTile = nextTile = null;
+				pathAStar = null;
+				return;
 			}
+
+			if (nextTile != null) {
+				float dist = Vector2.Distance(new Vector2(currTile.x, currTile.y), new Vector2(nextTile.x, nextTile.y));
+				if (dist > 1.42f || rerouteTimer <= 0 || nextTile.isWalkable == false) {
+					pathAStar = new Path_AStar(currTile.world, currTile, destTile);
+					nextTile = null;
+					rerouteTimer = 3f;
+				} else {
+					rerouteTimer -= deltaTime;
+				}
+			}
+		} else {
+			// Random walking
+			//destTile = getRandomWalkableTile();
+			//pathAStar = new Path_AStar(currTile.world, currTile, destTile);
 		}
 	}
 
