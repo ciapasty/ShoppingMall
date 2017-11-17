@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileType {empty, floor, wall};
-
 public class Tile {
 
 	public World world { get; protected set; }
@@ -12,13 +10,13 @@ public class Tile {
 	public int x { get; protected set; }
 	public int y { get; protected set; }
 
-	TileType _type = TileType.floor;
-	public TileType type { 
+	string _type = "floor_basic";
+	public string type { 
 		get {
 			return _type;
 		}
 		set {
-			TileType oldType = _type;
+			string oldType = _type;
 			_type = value;
 
 			if (cbTileChanged != null && oldType != value)
@@ -28,15 +26,13 @@ public class Tile {
 
 	public float movementCost { 
 		get {
-			switch (type) {
-			case TileType.floor:
+			if (type.Contains("floor")) {
 				if (hasSupply) {
 					return 2f;
 				}
 				return 1f;
-			case TileType.empty:
-				goto case TileType.wall;
-			case TileType.wall:
+			}
+			if (type.Contains("wall")) {
 				return 0f;
 			}
 			return 0f;
@@ -58,7 +54,7 @@ public class Tile {
 
 	Action<Tile> cbTileChanged;
 
-	public Tile(World world, int x, int y, TileType type) {
+	public Tile(World world, int x, int y, string type) {
 		this.world = world;
 		this.x = x;
 		this.y = y;

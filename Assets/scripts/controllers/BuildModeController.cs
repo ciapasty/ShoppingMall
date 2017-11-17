@@ -43,10 +43,10 @@ public class BuildModeController : MonoBehaviour {
 			if (tile.isBuildable) {
 				if (buildType == "demolish") {
 					// Quick demolish -> create job for that specifically
-					tile.type = TileType.floor;
+					//tile.type = TileType.floor;
 				} else {
 					if (tile.hasPendingJob == false) {
-						Job job = new Job(tile, 2f, "wall", buildJobFinished);
+						Job job = new Job(tile, 2f, buildType, buildJobFinished);
 						wc.world.jobQueue.enqueue(job);
 						placeTempGraphicFor(job);
 						tile.hasPendingJob = true;
@@ -58,7 +58,7 @@ public class BuildModeController : MonoBehaviour {
 
 	void buildJobFinished(Job job) {
 		// Bruteforce, only wall, loled
-		job.tile.type = TileType.wall;
+		job.tile.type = job.supply.type;
 
 		GameObject jobGO = jobBuildTempGraphics[job];
 		jobBuildTempGraphics.Remove(job);
@@ -79,7 +79,6 @@ public class BuildModeController : MonoBehaviour {
 		tempGO.transform.parent = transform;
 		SpriteRenderer tempSR = tempGO.AddComponent<SpriteRenderer>();
 		tempSR.color = new Color(1, 1, 1, 0.3f);
-		Debug.Log(tempSR.color);
 		return tempGO;
 	}
 

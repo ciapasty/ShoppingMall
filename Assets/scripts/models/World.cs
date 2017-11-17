@@ -27,11 +27,11 @@ public class World {
 
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				TileType type;
+				string type = "";
 				if (x == 0 || x == width-1 || y == 0 || y == height-1) {
-					type = TileType.wall;
+					type = "wall_basic";
 				} else {
-					type = TileType.floor;
+					type = "floor_basic";
 				}
 				Tile tile = new Tile(this, x, y, type);
 				tile.registerTileChangedCallback(OnTileChanged);

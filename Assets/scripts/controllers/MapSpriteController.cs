@@ -86,14 +86,14 @@ public class MapSpriteController : MonoBehaviour {
 	}
 
 	Sprite getSpriteForTile(Tile tile) {
-		if (tile.type == TileType.empty)
+		if (tile.type == "")
 			return null;
 
-		if (tile.type == TileType.floor)
-			return tileSprites["floor_"+Random.Range(0,4)];
+		if (tile.type.Contains("floor"))
+			return tileSprites[tile.type+"_"+Random.Range(0,4)];
 
-		if (tile.type == TileType.wall)
-			return tileSprites["wall_"+getCrossSpriteIndex(tile)];
+		if (tile.type.Contains("wall"))
+			return tileSprites[tile.type+"_"+getCrossSpriteIndex(tile)];
 
 		return null;
 	}
@@ -130,15 +130,15 @@ public class MapSpriteController : MonoBehaviour {
 			for (int y = 0; y < wc.world.height; y++) {
 				currTile = wc.world.getTileAt(x, y);
 				nextTile = wc.world.getTileAt(x, y+1);
-				if (currTile != null && currTile.type == TileType.wall) {
+				if (currTile != null && currTile.type.Contains("wall")) {
 					if (count == 0)
 						startTile = currTile;
 					count++;
 
-					if (nextTile == null || nextTile.type != TileType.wall) {
+					if (nextTile == null || nextTile.type.Contains("wall") == false) {
 						int length = currTile.y-startTile.y+1;
 						if (length == 1) {
-							if (wc.world.getTileAt(x+1, y).type != TileType.wall && wc.world.getTileAt(x-1, y).type != TileType.wall) {
+							if (wc.world.getTileAt(x+1, y).type.Contains("wall") == false && wc.world.getTileAt(x-1, y).type.Contains("wall") == false) {
 								createBoxCollider(
 									new Vector2(startTile.x+0.5f, ((startTile.y+currTile.y)/2f)+0.5f),
 									new Vector2(1f, length),
@@ -171,13 +171,13 @@ public class MapSpriteController : MonoBehaviour {
 			for (int x = 0; x < wc.world.width; x++) {
 				currTile = wc.world.getTileAt(x, y);
 				nextTile = wc.world.getTileAt(x+1, y);
-				if (currTile != null && currTile.type == TileType.wall) {
+				if (currTile != null && currTile.type.Contains("wall")) {
 					if (count == 0) {
 						startTile = currTile;
 					}
 					count++;
 
-					if (nextTile == null || nextTile.type != TileType.wall) {
+					if (nextTile == null || nextTile.type.Contains("wall") == false) {
 						int length = currTile.x-startTile.x+1;
 						if (length > 1) {
 							createBoxCollider(

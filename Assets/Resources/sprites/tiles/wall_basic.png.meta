@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b65595501073c466fbee37ceb4b90ab5
-timeCreated: 1510507813
+timeCreated: 1510940833
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -20,6 +20,23 @@ TextureImporter:
     21300026: wall_13
     21300028: wall_14
     21300030: wall_15
+    21300032: wall_basic_0
+    21300034: wall_basic_1
+    21300036: wall_basic_2
+    21300038: wall_basic_3
+    21300040: wall_basic_4
+    21300042: wall_basic_5
+    21300044: wall_basic_6
+    21300046: wall_basic_7
+    21300048: wall_basic_8
+    21300050: wall_basic_9
+    21300052: wall_basic_10
+    21300054: wall_basic_11
+    21300056: wall_basic_12
+    21300058: wall_basic_13
+    21300060: wall_basic_14
+    21300062: wall_basic_15
+  externalObjects: {}
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -73,6 +90,7 @@ TextureImporter:
   platformSettings:
   - buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
     compressionQuality: 50
@@ -81,6 +99,7 @@ TextureImporter:
     overridden: 0
   - buildTarget: Standalone
     maxTextureSize: 2048
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
     compressionQuality: 50
@@ -89,6 +108,7 @@ TextureImporter:
     overridden: 0
   - buildTarget: WebGL
     maxTextureSize: 2048
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
     compressionQuality: 50
@@ -99,7 +119,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: wall_0
+      name: wall_basic_0
       rect:
         serializedVersion: 2
         x: 0
@@ -113,7 +133,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_1
+      name: wall_basic_1
       rect:
         serializedVersion: 2
         x: 24
@@ -127,7 +147,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_2
+      name: wall_basic_2
       rect:
         serializedVersion: 2
         x: 48
@@ -141,7 +161,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_3
+      name: wall_basic_3
       rect:
         serializedVersion: 2
         x: 72
@@ -155,7 +175,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_4
+      name: wall_basic_4
       rect:
         serializedVersion: 2
         x: 96
@@ -169,7 +189,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_5
+      name: wall_basic_5
       rect:
         serializedVersion: 2
         x: 120
@@ -183,7 +203,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_6
+      name: wall_basic_6
       rect:
         serializedVersion: 2
         x: 144
@@ -197,7 +217,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_7
+      name: wall_basic_7
       rect:
         serializedVersion: 2
         x: 168
@@ -211,7 +231,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_8
+      name: wall_basic_8
       rect:
         serializedVersion: 2
         x: 0
@@ -225,7 +245,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_9
+      name: wall_basic_9
       rect:
         serializedVersion: 2
         x: 24
@@ -239,7 +259,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_10
+      name: wall_basic_10
       rect:
         serializedVersion: 2
         x: 48
@@ -253,7 +273,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_11
+      name: wall_basic_11
       rect:
         serializedVersion: 2
         x: 72
@@ -267,7 +287,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_12
+      name: wall_basic_12
       rect:
         serializedVersion: 2
         x: 96
@@ -281,7 +301,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_13
+      name: wall_basic_13
       rect:
         serializedVersion: 2
         x: 120
@@ -295,7 +315,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_14
+      name: wall_basic_14
       rect:
         serializedVersion: 2
         x: 144
@@ -309,7 +329,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: wall_15
+      name: wall_basic_15
       rect:
         serializedVersion: 2
         x: 168

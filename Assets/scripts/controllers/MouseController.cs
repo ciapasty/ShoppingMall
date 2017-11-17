@@ -29,13 +29,10 @@ public class MouseController : MonoBehaviour {
 
 		debug(overTile);
 
-		if (!EventSystem.current.IsPointerOverGameObject()) { // UI elements getting the hit/hover
+		if (!EventSystem.current.IsPointerOverGameObject()) { // Mouse is not over UI elements
 			if (bmc.isBuildModeEnabled) {
 				bmc.updateTempGraphic(overTile);
-			}
-
-			if (Input.GetMouseButtonDown(0)) {
-				if (bmc.isBuildModeEnabled) {
+				if (Input.GetMouseButtonDown(0)) {
 					bmc.doBuild(overTile);
 				}
 			}
