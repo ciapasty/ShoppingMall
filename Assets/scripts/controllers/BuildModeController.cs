@@ -12,6 +12,9 @@ public class BuildModeController : MonoBehaviour {
 	public GameObject tempGraphic { get; protected set; }
 	Dictionary<Job, GameObject> jobBuildTempGraphics;
 
+	// TEMP -> loaded from file??
+	public string[] buildTypes = {"wall_basic", "wall_fancy", "floor_basic", "floor_fancy"};
+
 	// Use this for initialization
 	void Start () {
 		wc = WorldController.Instance;
@@ -59,6 +62,7 @@ public class BuildModeController : MonoBehaviour {
 	void buildJobFinished(Job job) {
 		// Bruteforce, only wall, loled
 		job.tile.type = job.supply.type;
+		job.tile.hasPendingJob = false;
 
 		GameObject jobGO = jobBuildTempGraphics[job];
 		jobBuildTempGraphics.Remove(job);

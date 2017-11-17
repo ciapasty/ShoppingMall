@@ -48,7 +48,7 @@ public class Tile {
 	public bool hasSupply = false;
 	public bool isBuildable {
 		get {
-			return !(hasPendingJob || hasSupply || (movementCost < 0));
+			return !(hasPendingJob || hasSupply || (movementCost <= 0));
 		}
 	}
 
