@@ -86,15 +86,16 @@ public class MapSpriteController : MonoBehaviour {
 	}
 
 	Sprite getSpriteForTile(Tile tile) {
-		if (tile.type == "")
-			return null;
+		if (tile != null) {
+			if (tile.type == "")
+				return null;
 
-		if (tile.type.Contains("floor"))
-			return tileSprites[tile.type+"_"+Random.Range(0,4)];
+			if (tile.type.Contains("floor"))
+				return tileSprites[tile.type+"_"+Random.Range(0, 4)];
 
-		if (tile.type.Contains("wall"))
-			return tileSprites[tile.type+"_"+getCrossSpriteIndex(tile)];
-
+			if (tile.type.Contains("wall"))
+				return tileSprites[tile.type+"_"+getCrossSpriteIndex(tile)];
+		}
 		return null;
 	}
 

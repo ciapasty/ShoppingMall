@@ -11,6 +11,7 @@ public class BuildModeController : MonoBehaviour {
 
 	public GameObject tempGraphic { get; protected set; }
 	Dictionary<Job, GameObject> jobBuildTempGraphics;
+	Dictionary<Tile, Job> pendingJobs;
 
 	// TEMP -> loaded from file??
 	public string[] buildTypes = {"wall_basic", "wall_fancy", "floor_basic", "floor_fancy"};
@@ -20,6 +21,7 @@ public class BuildModeController : MonoBehaviour {
 		wc = WorldController.Instance;
 
 		jobBuildTempGraphics = new Dictionary<Job, GameObject>();
+		pendingJobs = new Dictionary<Tile, Job>();
 
 		tempGraphic = createTempGraphic();
 	}
@@ -47,19 +49,23 @@ public class BuildModeController : MonoBehaviour {
 			if (buildType == "demolish") {
 				if (tile.hasPendingJob == false) {
 					if (tile.type.Contains("floor") == false) {
-						job = new Job(tile, 3f, null, demolishJobFinished);
+						job = new Job(tile, 3f, null, demolishJobFinished, buildJobCancelled);
 					}
+				} else {
+					Job pendingJob = pendingJobs[tile];
+					pendingJob.cancel();
 				}
 			} else {
 				if (tile.isBuildable) {
 					if (tile.hasPendingJob == false) {
-						job = new Job(tile, 2f, buildType, buildJobFinished);
+						job = new Job(tile, 2f, buildType, buildJobFinished, buildJobCancelled);
 					}
 				}
 			}
 			if (job != null) {
 				wc.world.jobQueue.enqueue(job);
 				placeTempGraphicFor(job);
+				pendingJobs.Add(tile, job);
 				tile.hasPendingJob = true;
 			}
 		}
@@ -68,22 +74,28 @@ public class BuildModeController : MonoBehaviour {
 	void buildJobFinished(Job job) {
 		job.tile.type = job.supply.type;
 		job.tile.hasPendingJob = false;
-
+		pendingJobs.Remove(job.tile);
 		GameObject jobGO = jobBuildTempGraphics[job];
 		jobBuildTempGraphics.Remove(job);
 		Destroy(jobGO);
-
 		//Debug.Log("Wall set on tile ("+job.tile.x+", "+job.tile.y+")");
+	}
+
+	void buildJobCancelled(Job job) {
+		job.tile.hasPendingJob = false;
+		pendingJobs.Remove(job.tile);
+		GameObject jobGO = jobBuildTempGraphics[job];
+		jobBuildTempGraphics.Remove(job);
+		Destroy(jobGO);
 	}
 
 	void demolishJobFinished(Job job) {
 		job.tile.type = "floor_basic";
 		job.tile.hasPendingJob = false;
-
+		pendingJobs.Remove(job.tile);
 		GameObject jobGO = jobBuildTempGraphics[job];
 		jobBuildTempGraphics.Remove(job);
 		Destroy(jobGO);
-
 		//Debug.Log("Wall demolished on tile ("+job.tile.x+", "+job.tile.y+")");
 	}
 

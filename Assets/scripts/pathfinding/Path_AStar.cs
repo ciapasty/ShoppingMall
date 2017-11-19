@@ -6,6 +6,14 @@ using System.Linq;
 public class Path_AStar {
 
 	Queue<Tile> path;
+	public int length {
+		get {
+			if (path == null)
+				return 0;
+
+			return path.Count;
+		}
+	}
 
 	public Path_AStar(World world, Tile tileStart, Tile tileEnd) {
 
@@ -163,13 +171,6 @@ public class Path_AStar {
 
 	public Tile Dequeue() {
 		return path.Dequeue();
-	}
-
-	public int Length() {
-		if(path == null)
-			return 0;
-
-		return path.Count;
 	}
 
 }

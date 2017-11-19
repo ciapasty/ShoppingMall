@@ -19,6 +19,7 @@ public class JobQueue {
 		if (job.supply != null) {
 			job.registerSupplyDeliveredCallback(supplyDelivered);
 			job.registerJobFinishedCallback(jobFinished);
+			job.registerJobCancelledCallback(jobCanceled);
 
 			pendingJobs.Add(job);
 			deliverables.Add(job.supply);
@@ -37,13 +38,30 @@ public class JobQueue {
 		availableJobs.Enqueue(job);
 	}
 
+	public void jobUnreachable(Job job) {
+		availableJobs.Enqueue(job);
+	}
+
 	// Is this required??
 	void jobFinished(Job job) {
 		job.unregisterSupplyDeliveredCallback(supplyDelivered);
 	}
 
 	void jobCanceled(Job job) {
-		
+		if (pendingJobs.Contains(job)) {
+			pendingJobs.Remove(job);
+			if (job.supply != null && deliverables.Contains(job.supply))
+				deliverables.Remove(job.supply);
+		}
+
+		if (availableJobs.Contains(job)) {
+			List<Job> jobList = new List<Job>(availableJobs.ToArray());
+			jobList.Remove(job);
+			availableJobs = new Queue<Job>(jobList);
+		}
+
+		job.unregisterSupplyDeliveredCallback(supplyDelivered);
+		job.unregisterJobCancelledCallback(jobCanceled);
 	}
 
 	void jobAbandoned(Job job) {

@@ -14,10 +14,11 @@ public class Job {
 	Action<Job> cbJobFinished;
 	Action<Job> cbJobCancelled;
 
-	public Job(Tile tile, float time, string supplyType, Action<Job> cbJobFinished) {
+	public Job(Tile tile, float time, string supplyType, Action<Job> cbJobFinished, Action<Job> cbJobCancelled) {
 		this.tile = tile;
 		this.time = time;
 		this.cbJobFinished = cbJobFinished;
+		this.cbJobCancelled = cbJobCancelled;
 
 		if (supplyType != null)
 			supply = new Supply(supplyType, supplyDelivered);

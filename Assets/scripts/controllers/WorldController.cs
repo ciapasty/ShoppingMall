@@ -64,6 +64,7 @@ public class WorldController : MonoBehaviour {
 
 		c.registerPickupSupplyCallback(pickupSupply);
 		c.registerSupplyUsedCallback(supplyUsed);
+		c.registerDropSupplyCallback(dropSupply);
 
 		characters.Add(c, charGO);
 	}
@@ -100,5 +101,12 @@ public class WorldController : MonoBehaviour {
 		GameObject supGO = supplyGameObjects[c.job.supply];
 		supplyGameObjects.Remove(c.job.supply);
 		Destroy(supGO);
+	}
+
+	void dropSupply(Character c) {
+		GameObject supGO = supplyGameObjects[c.job.supply];
+		supGO.transform.SetParent(this.transform);
+		supGO.transform.position = new Vector3(c.currTile.x+0.5f, c.currTile.y+0.5f, 0);
+		c.job.supply.setTile(c.currTile);
 	}
 }

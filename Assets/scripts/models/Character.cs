@@ -37,9 +37,10 @@ public class Character {
 
 	// DEBUG
 	public void setDestination(Tile tile) {
-		destTile = tile;
-		pathAStar = new Path_AStar(currTile.world, currTile, destTile);	// This will calculate a path from curr to dest.
-		if (pathAStar.Length() == 0) {
+		if (isTileReachable(tile)) {
+			destTile = tile;
+			pathAStar = new Path_AStar(currTile.world, currTile, destTile);	// This will calculate a path from curr to dest.
+		} else {
 			// There is no path to destination
 			Debug.LogError("Character on tile: "+currTile.x+", "+currTile.y+" has no path to: "+destTile.x+", "+destTile.y);
 		}
@@ -58,6 +59,18 @@ public class Character {
 
 	void doJob(float deltaTime) {
 		if (job != null) {
+			if (isReturningSupply) {
+				if (currTile == destTile) {
+					// Character is settin supply down
+					cbDropSupply(this);
+					isReturningSupply = false;
+					isCarryingSupply = false;
+					job = null;
+					jobTile = destTile = nextTile = null;
+				}
+				return;
+			}
+
 			if (job.supply != null) {
 				// Job requires supply pickup
 				jobTile = job.tile;
@@ -89,7 +102,14 @@ public class Character {
 		} else {
 			if (currTile.world.jobQueue.availableJobs.Count > 0) {
 				job = currTile.world.jobQueue.dequeue();
+				if (isJobReachable(job) == false) {
+					currTile.world.jobQueue.jobUnreachable(job);
+					Debug.LogError("Job on tile ("+job.tile.x+", "+job.tile.y+") in unreachable!");
+					job = null;
+					return;
+				}
 				job.registerJobFinishedCallback(jobFinished);
+				job.registerJobCancelledCallback(jobCancelled);
 			}
 		}
 
@@ -105,11 +125,33 @@ public class Character {
 		jobTile = destTile = nextTile = null;
 	}
 
+	void jobCancelled(Job job) {
+		if (isCarryingSupply) {
+			isReturningSupply = true;
+			setDestination(currTile.world.getEmptyTile());
+		} else {
+			this.job = null;
+			jobTile = destTile = nextTile = null;
+		}
+		job.unregisterJobCancelledCallback(jobCancelled);
+	}
+
+	bool isJobReachable(Job job) {
+		if (job.supply != null)
+			return isTileReachable(job.supply.tile) && isTileReachable(job.tile);
+
+		return isTileReachable(job.tile.getWalkableNeighbour());
+	}
+
+	bool isTileReachable(Tile tile) {
+		return (new Path_AStar(currTile.world, currTile, tile)).length > 0;
+	}
+
 	void updateMovement(Tile tile, float deltaTime) {
 		if (destTile != null) {
 			if (currTile == nextTile || nextTile == null) {
 				if (pathAStar != null) {
-					if (pathAStar.Length() > 0) {
+					if (pathAStar.length > 0) {
 						nextTile = pathAStar.Dequeue();
 						return;
 					}
