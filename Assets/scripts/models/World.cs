@@ -79,7 +79,7 @@ public class World {
 		int y = UnityEngine.Random.Range(1, height);
 
 		Tile tile = getTileAt(x, y);
-		if (tile.movementCost == 0 || tile.hasPendingJob)
+		if (tile.movementCost < 0 || tile.hasPendingJob)
 			tile = getEmptyTile();
 
 		return tile;

@@ -50,10 +50,10 @@ public class Path_TileGraph {
 		int dY = curr.y - neigh.y;
 
 		if (Mathf.Abs(dX)+Mathf.Abs(dY) == 2) {
-			if (curr.world.getTileAt(curr.x-dX, curr.y).movementCost == 0) {
+			if (curr.world.getTileAt(curr.x-dX, curr.y).movementCost < 0) {
 				return true;
 			}
-			if (curr.world.getTileAt(curr.x, curr.y-dY).movementCost == 0) {
+			if (curr.world.getTileAt(curr.x, curr.y-dY).movementCost < 0) {
 				return true;
 			}
 		}

@@ -10,16 +10,18 @@ public class Character {
 	public Tile currTile { get; protected set; }
 	public Tile nextTile { get; protected set; }
 	Tile destTile;
+	Tile jobTile;
 
 	Path_AStar pathAStar = null;
 
-	public float speed = 1;
+	//public float speed = 1;
 	public int weight { get; protected set; }
 
 	float rerouteTimer = 3f;
 
 	public Job job { get; protected set; }
-	public bool hasSupply { get; protected set; }
+	public bool isCarryingSupply { get; protected set; }
+	public bool isReturningSupply { get; protected set; }
 	Action<Character> cbPickupSupply;
 	Action<Character> cbDropSupply;
 	Action<Character> cbSupplyUsed;
@@ -37,7 +39,7 @@ public class Character {
 	public void setDestination(Tile tile) {
 		destTile = tile;
 		pathAStar = new Path_AStar(currTile.world, currTile, destTile);	// This will calculate a path from curr to dest.
-		if (pathAStar == null) {
+		if (pathAStar.Length() == 0) {
 			// There is no path to destination
 			Debug.LogError("Character on tile: "+currTile.x+", "+currTile.y+" has no path to: "+destTile.x+", "+destTile.y);
 		}
@@ -58,26 +60,31 @@ public class Character {
 		if (job != null) {
 			if (job.supply != null) {
 				// Job requires supply pickup
-				if (hasSupply == false) {
+				jobTile = job.tile;
+				if (isCarryingSupply == false) {
 					// Check if worker is going to supply tile
 					if (destTile != job.supply.tile)
 						setDestination(job.supply.tile);
 					// Check if worker is at supply tile
 					if (currTile == job.supply.tile) {
+						// Character has picked up supply
 						cbPickupSupply(this);
-						hasSupply = true;
+						isCarryingSupply = true;
 						job.supply.tile.hasSupply = false;
 					}
 					return;
-				} 
-				// Check if worker is on job tile
-				if (destTile != job.tile) {
-					setDestination(job.tile);
 				}
-				// Check if worker is at job tile
-				if (currTile == job.tile) {
-					job.doJob(deltaTime);
-				}
+			} else {
+				jobTile = job.tile.getWalkableNeighbour();
+			}
+			// Set job tile and check if worker is on job tile
+			if (destTile != jobTile) {
+				setDestination(jobTile);
+			}
+			// Check if worker is at job tile
+			if (currTile == jobTile) {
+				destTile = nextTile = null;
+				job.doJob(deltaTime);
 			}
 		} else {
 			if (currTile.world.jobQueue.availableJobs.Count > 0) {
@@ -89,13 +96,13 @@ public class Character {
 	}
 
 	void jobFinished(Job job) {
-		if (cbSupplyUsed != null) {
+		if (job.supply != null && cbSupplyUsed != null) {
 			cbSupplyUsed(this);
 		}
-		hasSupply = false;
+		isCarryingSupply = false;
 		this.job = null;
 
-		destTile = nextTile = null;
+		jobTile = destTile = nextTile = null;
 	}
 
 	void updateMovement(Tile tile, float deltaTime) {
@@ -118,7 +125,7 @@ public class Character {
 			if (nextTile != null) {
 				float dist = Vector2.Distance(new Vector2(currTile.x, currTile.y), new Vector2(nextTile.x, nextTile.y));
 				if (dist > 1.42f || rerouteTimer <= 0 || nextTile.isWalkable == false) {
-					pathAStar = new Path_AStar(currTile.world, currTile, destTile);
+					setDestination(destTile);
 					nextTile = null;
 					rerouteTimer = 3f;
 				} else {
@@ -127,8 +134,8 @@ public class Character {
 			}
 		} else {
 			// Random walking
-			//destTile = getRandomWalkableTile();
-			//pathAStar = new Path_AStar(currTile.world, currTile, destTile);
+//			destTile = getRandomWalkableTile();
+//			pathAStar = new Path_AStar(currTile.world, currTile, destTile);
 		}
 	}
 
@@ -151,6 +158,14 @@ public class Character {
 
 	public void unregisterPickupSupplyCallback(Action<Character> callback) {
 		cbPickupSupply -= callback;
+	}
+
+	public void registerDropSupplyCallback(Action<Character> callback) {
+		cbDropSupply += callback;
+	}
+
+	public void unregisterDropSupplyCallback(Action<Character> callback) {
+		cbDropSupply -= callback;
 	}
 
 	public void registerSupplyUsedCallback(Action<Character> callback) {

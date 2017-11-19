@@ -16,11 +16,15 @@ public class JobQueue {
 	}
 
 	public void enqueue(Job job) {
-		job.registerSupplyDeliveredCallback(supplyDelivered);
-		job.registerJobFinishedCallback(jobFinished);
+		if (job.supply != null) {
+			job.registerSupplyDeliveredCallback(supplyDelivered);
+			job.registerJobFinishedCallback(jobFinished);
 
-		pendingJobs.Add(job);
-		deliverables.Add(job.supply);
+			pendingJobs.Add(job);
+			deliverables.Add(job.supply);
+		} else {
+			availableJobs.Enqueue(job);
+		}
 	}
 
 	public Job dequeue() {
@@ -36,6 +40,10 @@ public class JobQueue {
 	// Is this required??
 	void jobFinished(Job job) {
 		job.unregisterSupplyDeliveredCallback(supplyDelivered);
+	}
+
+	void jobCanceled(Job job) {
+		
 	}
 
 	void jobAbandoned(Job job) {

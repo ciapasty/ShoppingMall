@@ -30,12 +30,14 @@ public class Tile {
 				if (hasSupply) {
 					return 2f;
 				}
+				if (type == "floor_fancy")
+					return 0.7f;
 				return 1f;
 			}
 			if (type.Contains("wall")) {
-				return 0f;
+				return -1f;
 			}
-			return 0f;
+			return -1f;
 		}
 	}
 	public bool isWalkable {
@@ -48,7 +50,7 @@ public class Tile {
 	public bool hasSupply = false;
 	public bool isBuildable {
 		get {
-			return !(hasPendingJob || hasSupply || (movementCost <= 0));
+			return !(hasPendingJob || hasSupply || (movementCost < 0));
 		}
 	}
 
@@ -59,6 +61,14 @@ public class Tile {
 		this.x = x;
 		this.y = y;
 		this.type = type;
+	}
+
+	public Tile getWalkableNeighbour() {
+		foreach (var neighbour in getNeighbours()) {
+			if (neighbour != null && neighbour.isWalkable)
+				return neighbour;
+		}
+		return null;
 	}
 
 	public Tile[] getNeighbours(bool diagOkay = false) {

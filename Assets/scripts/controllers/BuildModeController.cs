@@ -43,24 +43,29 @@ public class BuildModeController : MonoBehaviour {
 
 	public void doBuild(Tile tile) {
 		if (isBuildModeEnabled) {
-			if (tile.isBuildable) {
-				if (buildType == "demolish") {
-					// Quick demolish -> create job for that specifically
-					//tile.type = TileType.floor;
-				} else {
-					if (tile.hasPendingJob == false) {
-						Job job = new Job(tile, 2f, buildType, buildJobFinished);
-						wc.world.jobQueue.enqueue(job);
-						placeTempGraphicFor(job);
-						tile.hasPendingJob = true;
+			Job job = null;
+			if (buildType == "demolish") {
+				if (tile.hasPendingJob == false) {
+					if (tile.type.Contains("floor") == false) {
+						job = new Job(tile, 3f, null, demolishJobFinished);
 					}
 				}
+			} else {
+				if (tile.isBuildable) {
+					if (tile.hasPendingJob == false) {
+						job = new Job(tile, 2f, buildType, buildJobFinished);
+					}
+				}
+			}
+			if (job != null) {
+				wc.world.jobQueue.enqueue(job);
+				placeTempGraphicFor(job);
+				tile.hasPendingJob = true;
 			}
 		}
 	}
 
 	void buildJobFinished(Job job) {
-		// Bruteforce, only wall, loled
 		job.tile.type = job.supply.type;
 		job.tile.hasPendingJob = false;
 
@@ -68,7 +73,18 @@ public class BuildModeController : MonoBehaviour {
 		jobBuildTempGraphics.Remove(job);
 		Destroy(jobGO);
 
-		Debug.Log("Wall set on tile ("+job.tile.x+", "+job.tile.y+")");
+		//Debug.Log("Wall set on tile ("+job.tile.x+", "+job.tile.y+")");
+	}
+
+	void demolishJobFinished(Job job) {
+		job.tile.type = "floor_basic";
+		job.tile.hasPendingJob = false;
+
+		GameObject jobGO = jobBuildTempGraphics[job];
+		jobBuildTempGraphics.Remove(job);
+		Destroy(jobGO);
+
+		//Debug.Log("Wall demolished on tile ("+job.tile.x+", "+job.tile.y+")");
 	}
 
 	void placeTempGraphicFor(Job job) {
@@ -96,12 +112,22 @@ public class BuildModeController : MonoBehaviour {
 	}
 
 	public void updateTempGraphic(Tile tile) {
-		SpriteRenderer tempSR = tempGraphic.GetComponent<SpriteRenderer>();
-		tempGraphic.transform.position = new Vector3(tile.x+0.5f, tile.y+0.5f, 0);
-		if (tile.isBuildable == false) {
-			tempSR.color = new Color(1, 0.5f, 0.5f, 0.3f);
-		} else {
-			tempSR.color = new Color(1, 1, 1, 0.3f);
+		if (tile != null) {
+			SpriteRenderer tempSR = tempGraphic.GetComponent<SpriteRenderer>();
+			tempGraphic.transform.position = new Vector3(tile.x+0.5f, tile.y+0.5f, 0);
+			if (tile.isBuildable == false) {
+				if (buildType == "demolish") {
+					tempSR.color = new Color(1, 1, 1, 0.3f);
+				} else {
+					tempSR.color = new Color(1, 0.5f, 0.5f, 0.3f);
+				}
+			} else {
+				if (buildType == "demolish") {
+					tempSR.color = new Color(1, 0.5f, 0.5f, 0.0f);
+				} else {
+					tempSR.color = new Color(1, 1, 1, 0.3f);
+				}
+			}
 		}
 	}
 }

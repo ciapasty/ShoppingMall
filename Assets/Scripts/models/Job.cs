@@ -8,7 +8,7 @@ public class Job {
 	public Tile tile { get; protected set; }
 	public float time { get; protected set; }
 
-	public Supply supply;
+	public Supply supply = null;
 
 	Action<Job> cbSupplyReady;
 	Action<Job> cbJobFinished;
@@ -19,7 +19,8 @@ public class Job {
 		this.time = time;
 		this.cbJobFinished = cbJobFinished;
 
-		supply = new Supply(supplyType, supplyDelivered);
+		if (supplyType != null)
+			supply = new Supply(supplyType, supplyDelivered);
 	}
 
 	public void doJob(float workTime) {

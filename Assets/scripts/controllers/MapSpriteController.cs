@@ -102,16 +102,16 @@ public class MapSpriteController : MonoBehaviour {
 		Tile[] neighbours = tile.getNeighbours();
 		var sum = 0;
 		// North
-		if (neighbours[0] != null && neighbours[0].type == tile.type)
+		if (neighbours[0] != null && neighbours[0].type.Split('_')[0] == tile.type.Split('_')[0])
 			sum += 1;
 		// East
-		if (neighbours[1] != null && neighbours[1].type == tile.type)
+		if (neighbours[1] != null && neighbours[1].type.Split('_')[0] == tile.type.Split('_')[0])
 			sum += 2;
 		//South
-		if (neighbours[2] != null && neighbours[2].type == tile.type)
+		if (neighbours[2] != null && neighbours[2].type.Split('_')[0] == tile.type.Split('_')[0])
 			sum += 4;
 		// West
-		if (neighbours[3] != null && neighbours[3].type == tile.type)
+		if (neighbours[3] != null && neighbours[3].type.Split('_')[0] == tile.type.Split('_')[0])
 			sum += 8;
 		return sum;
 	}

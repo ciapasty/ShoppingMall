@@ -7,10 +7,11 @@ public class WorkerController : MonoBehaviour {
 	WorldController wc;
 
 	Rigidbody2D body;
-	float neighboursRadius = 2f;
-	float minCharacterDistance = 0.3f;
+	float neighboursRadius = 1.5f;
+	float minCharacterDistance = 0.4f;
 	float forceRate = 1000;
-	float randomForceFactor = 5;
+	float randomForceFactor = 3;
+	public float speed = 1f;
 
 	Animator anim;
 
@@ -50,9 +51,10 @@ public class WorkerController : MonoBehaviour {
 			}
 		}
 
+		Vector2 force = -(new Vector2(v.x, v.y)).normalized;
+
 		if (character.nextTile != null) {
-			Vector2 moveDirection = getMoveDirection(gameObject.transform.position, character.nextTile) - (new Vector2(v.x, v.y));
-			body.AddForce(moveDirection*forceRate*character.speed);
+			force += getMoveDirection(gameObject.transform.position, character.nextTile);
 		}
 		Tile currTile = wc.world.getTileAtPosition(new Vector3(gameObject.transform.position.x, gameObject.transform.position.y+0.1f, 0));
 		character.updatePosition(currTile, Time.deltaTime);
@@ -61,6 +63,7 @@ public class WorkerController : MonoBehaviour {
 			anim.SetFloat("speed", body.velocity.magnitude/3);
 		}
 
+		body.AddForce( force*forceRate * (speed/currTile.movementCost) );
 		anim.SetBool("isWalking", (body.velocity.x != 0 || body.velocity.y != 0));
 		GetComponent<SpriteRenderer>().flipX = (body.velocity.x < -0.2f);
 	}

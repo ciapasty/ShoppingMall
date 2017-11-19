@@ -6,8 +6,8 @@ public class WorldController : MonoBehaviour {
 
 	public static WorldController Instance { get; protected set; }
 
-	public int width = 20;
-	public int height = 20;
+	public int width = 100;
+	public int height = 100;
 
 	Dictionary<Character, GameObject> characters;
 	Dictionary<Supply, GameObject> supplyGameObjects;
