@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 32c0db75487394164b9f62917cc1c8ca
-timeCreated: 1511096146
+guid: 46fff4c1f963a4dbabef5a7f9857cc40
+timeCreated: 1511096119
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: client_1_0
-    21300002: client_1_1
-    21300004: client_1_2
-    21300006: client_1_3
-    21300008: client_1_4
-    21300010: client_1_5
+    21300000: staff_1_0
+    21300002: staff_1_1
+    21300004: staff_1_2
+    21300006: staff_1_3
+    21300008: staff_1_4
+    21300010: staff_1_5
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -49,7 +49,7 @@ TextureImporter:
   spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
+  alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 24
@@ -93,7 +93,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: client_1_0
+      name: staff_1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -107,7 +107,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: client_1_1
+      name: staff_1_1
       rect:
         serializedVersion: 2
         x: 24
@@ -121,7 +121,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: client_1_2
+      name: staff_1_2
       rect:
         serializedVersion: 2
         x: 48
@@ -135,7 +135,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: client_1_3
+      name: staff_1_3
       rect:
         serializedVersion: 2
         x: 72
@@ -149,7 +149,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: client_1_4
+      name: staff_1_4
       rect:
         serializedVersion: 2
         x: 96
@@ -163,7 +163,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: client_1_5
+      name: staff_1_5
       rect:
         serializedVersion: 2
         x: 120

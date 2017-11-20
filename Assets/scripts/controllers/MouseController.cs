@@ -9,6 +9,8 @@ public class MouseController : MonoBehaviour {
 
 	Vector3 currFramePosition;
 	Vector3 lastFramePosition;
+	Vector3 dragStartPosition;
+	Vector3 dragEndPosition;
 
 	BuildModeController bmc;
 
@@ -29,21 +31,37 @@ public class MouseController : MonoBehaviour {
 
 		debug(overTile);
 
-		if (!EventSystem.current.IsPointerOverGameObject()) { // Mouse is not over UI elements
-			if (bmc.isBuildModeEnabled) {
-				bmc.updateTempGraphic(overTile);
-				if (Input.GetMouseButtonDown(0)) {
-					bmc.doBuild(overTile);
-				}
-			}
-		}
-
+		updateDragging();
 		cancelActions();
-
 		updateCameraMovement();
 
 		lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		lastFramePosition.z = 0;
+	}
+
+	void updateDragging() {
+		if (!EventSystem.current.IsPointerOverGameObject()) { // Mouse is not over UI elements
+			if (bmc.isBuildModeEnabled) {
+
+				bmc.updatePlaceholderGraphics(wc.world.getTileAtPosition(currFramePosition), null);
+
+				if (Input.GetMouseButtonDown(0)) {
+					dragStartPosition = currFramePosition;
+				}
+
+				if (Input.GetMouseButton(0)) {
+					dragEndPosition = currFramePosition;
+					bmc.updatePlaceholderGraphics(wc.world.getTileAtPosition(dragStartPosition), wc.world.getTileAtPosition(dragEndPosition));
+					if (Input.GetMouseButtonDown(1))
+						cancelActions();
+				}
+
+				if (Input.GetMouseButtonUp(0)) {
+					bmc.updatePlaceholderGraphics(wc.world.getTileAtPosition(dragStartPosition), wc.world.getTileAtPosition(dragEndPosition));
+					bmc.doBuild();
+				}
+			}
+		}
 	}
 
 	void cancelActions() {
@@ -54,15 +72,25 @@ public class MouseController : MonoBehaviour {
 
 	void updateCameraMovement() {
 		// Handle screen panning
-		if( Input.GetMouseButton(1) ) {	// Right or Middle Mouse Button
-
+		if(Input.GetMouseButton(1)) {	// Right or Middle Mouse Button
 			Vector3 diff = lastFramePosition - currFramePosition;
 			Camera.main.transform.Translate( diff );
-
 		}
-
 		Camera.main.orthographicSize -= Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 3f, Mathf.Max(WorldController.Instance.world.height, WorldController.Instance.world.height));
+	}
+
+	GameObject createTempGraphic() {
+		GameObject tempGO = new GameObject();
+		tempGO.transform.parent = transform;
+		SpriteRenderer tempSR = tempGO.AddComponent<SpriteRenderer>();
+		tempSR.color = new Color(1, 1, 1, 0.3f);
+		if (bmc.buildType != "") {
+			tempSR.sprite = Resources.Load<Sprite>("sprites/tiles/"+bmc.buildType);
+		} else {
+			tempSR.sprite = null;
+		}
+		return tempGO;
 	}
 
 	// ===== DEBUG =====
