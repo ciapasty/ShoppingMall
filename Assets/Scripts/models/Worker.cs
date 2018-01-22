@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character {
+public class Worker {
 
 	//public Queue<Tile> path { get; protected set; }
 	Tile prevTile;
@@ -22,15 +22,15 @@ public class Character {
 	public Job job { get; protected set; }
 	public bool isCarryingSupply { get; protected set; }
 	public bool isReturningSupply { get; protected set; }
-	Action<Character> cbPickupSupply;
-	Action<Character> cbDropSupply;
-	Action<Character> cbSupplyUsed;
+	Action<Worker> cbPickupSupply;
+	Action<Worker> cbDropSupply;
+	Action<Worker> cbSupplyUsed;
 
-	public Character() {
+	public Worker() {
 		this.weight = 50;
 	}
 
-	public Character(int weight, Tile tile) {
+	public Worker(int weight, Tile tile) {
 		this.weight = weight;
 		currTile = nextTile = destTile = tile;
 	}
@@ -59,6 +59,13 @@ public class Character {
 
 	void doJob(float deltaTime) {
 		if (job != null) {
+			// Check if worker is at job tile
+			if (currTile == jobTile) {
+				destTile = nextTile = null;
+				job.doJob(deltaTime);
+				return;
+			}
+
 			if (isReturningSupply) {
 				if (currTile == destTile) {
 					// Character is settin supply down
@@ -94,16 +101,11 @@ public class Character {
 			if (destTile != jobTile) {
 				setDestination(jobTile);
 			}
-			// Check if worker is at job tile
-			if (currTile == jobTile) {
-				destTile = nextTile = null;
-				job.doJob(deltaTime);
-			}
 		} else {
-			if (currTile.world.jobQueue.availableJobs.Count > 0) {
-				job = currTile.world.jobQueue.dequeue();
+			if (currTile.world.buildJobQueue.availableJobs.Count > 0) {
+				job = currTile.world.buildJobQueue.dequeue();
 				if (isJobReachable(job) == false) {
-					currTile.world.jobQueue.jobUnreachable(job);
+					currTile.world.buildJobQueue.jobUnreachable(job);
 					Debug.LogError("Job on tile ("+job.tile.x+", "+job.tile.y+") in unreachable!");
 					job = null;
 					return;
@@ -194,27 +196,27 @@ public class Character {
 
 	// ===== Callbacks =====
 
-	public void registerPickupSupplyCallback(Action<Character> callback) {
+	public void registerPickupSupplyCallback(Action<Worker> callback) {
 		cbPickupSupply += callback;
 	}
 
-	public void unregisterPickupSupplyCallback(Action<Character> callback) {
+	public void unregisterPickupSupplyCallback(Action<Worker> callback) {
 		cbPickupSupply -= callback;
 	}
 
-	public void registerDropSupplyCallback(Action<Character> callback) {
+	public void registerDropSupplyCallback(Action<Worker> callback) {
 		cbDropSupply += callback;
 	}
 
-	public void unregisterDropSupplyCallback(Action<Character> callback) {
+	public void unregisterDropSupplyCallback(Action<Worker> callback) {
 		cbDropSupply -= callback;
 	}
 
-	public void registerSupplyUsedCallback(Action<Character> callback) {
+	public void registerSupplyUsedCallback(Action<Worker> callback) {
 		cbSupplyUsed += callback;
 	}
 
-	public void unregisterSupplyUsedCallback(Action<Character> callback) {
+	public void unregisterSupplyUsedCallback(Action<Worker> callback) {
 		cbSupplyUsed -= callback;
 	}
 }

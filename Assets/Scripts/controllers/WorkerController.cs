@@ -15,7 +15,7 @@ public class WorkerController : MonoBehaviour {
 
 	Animator anim;
 
-	public Character character;
+	public Worker character;
 
 	// Use this for initialization
 	void Start () {
@@ -79,7 +79,7 @@ public class WorkerController : MonoBehaviour {
 		return dir;
 	}
 
-	public void setCharacter(Character c) {
+	public void setCharacter(Worker c) {
 		character = c;
 	}
 }

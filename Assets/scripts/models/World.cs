@@ -11,12 +11,15 @@ public class World {
 	Tile[,] tileMap;
 	public Path_TileGraph tileGraph;
 
-	public List<Character> chars;
+	public List<Worker> chars;
+	public List<Area> areas;
+	public List<Shelf> shelves;
 
-	public JobQueue jobQueue;
+	public JobQueue buildJobQueue;
+	public JobQueue staffJobQueue;
 
 	Action<Tile> cbTileChanged;
-	Action<Character> cbCharacterSpawned;
+	Action<Worker> cbCharacterSpawned;
 
 	public World(int width, int height) {
 
@@ -39,8 +42,11 @@ public class World {
 			}
 		}
 
-		chars = new List<Character>();
-		jobQueue = new JobQueue();
+		chars = new List<Worker>();
+		areas = new List<Area>();
+		shelves = new List<Shelf>();
+		buildJobQueue = new JobQueue();
+		staffJobQueue = new JobQueue();
 	}
 
 	void invalidateTileGraph() {
@@ -67,7 +73,7 @@ public class World {
 		invalidateTileGraph();
 	}
 
-	public void spawnCharacter(Character c) {
+	public void spawnCharacter(Worker c) {
 		chars.Add(c);
 
 		if (cbCharacterSpawned != null)
@@ -95,11 +101,11 @@ public class World {
 		cbTileChanged -= callback;
 	}
 
-	public void registerCharacterSpawnedCallback(Action<Character> callback) {
+	public void registerCharacterSpawnedCallback(Action<Worker> callback) {
 		cbCharacterSpawned += callback;
 	}
 
-	public void unregisterCharacterSpawnedCallback(Action<Character> callback) {
+	public void unregisterCharacterSpawnedCallback(Action<Worker> callback) {
 		cbCharacterSpawned -= callback;
 	}
 }

@@ -12,9 +12,8 @@ public class MapSpriteController : MonoBehaviour {
 	public int pixelsPerUnit;
 	public Material spriteDiffuseMaterial;
 	Dictionary<string, Sprite> tileSprites;
-	public Sprite floorSprite;
-	public Sprite wallSprite;
 
+	public GameObject boxColliderPrefab;
 	List<GameObject> wallBoxCollidersGOs;
 
 	void Start () {
@@ -48,7 +47,12 @@ public class MapSpriteController : MonoBehaviour {
 
 		mapTexture.Apply();
 
-		Sprite sp = Sprite.Create(mapTexture, new Rect(0,0, mapTexture.width, mapTexture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+		Sprite sp = Sprite.Create(
+			mapTexture, 
+			new Rect(0,0, mapTexture.width, mapTexture.height), 
+			new Vector2(0.5f, 0.5f),
+			pixelsPerUnit
+		);
 		SpriteRenderer sr = mapGo.AddComponent<SpriteRenderer>();
 		sr.material = spriteDiffuseMaterial;
 		sr.sprite = sp;
@@ -58,12 +62,23 @@ public class MapSpriteController : MonoBehaviour {
 
 	void drawTile(Tile tile) {
 		Sprite sprite;
-		Color[] cols;
+		Color[] colors;
 		sprite = getSpriteForTile(tile);
 
 		if (sprite != null) {
-			cols = sprite.texture.GetPixels((int)sprite.rect.x, (int)sprite.rect.y, (int)sprite.rect.width, (int)sprite.rect.height);
-			mapTexture.SetPixels(tile.x*pixelsPerUnit, tile.y*pixelsPerUnit, (int)sprite.rect.width, (int)sprite.rect.height, cols);
+			colors = sprite.texture.GetPixels(
+				(int)sprite.rect.x, 
+				(int)sprite.rect.y, 
+				(int)sprite.rect.width, 
+				(int)sprite.rect.height
+			);
+			mapTexture.SetPixels(
+				tile.x*pixelsPerUnit, 
+				tile.y*pixelsPerUnit, 
+				(int)sprite.rect.width, 
+				(int)sprite.rect.height, 
+				colors
+			);
 		}
 	}
 
@@ -139,7 +154,8 @@ public class MapSpriteController : MonoBehaviour {
 					if (nextTile == null || nextTile.type.Contains("wall") == false) {
 						int length = currTile.y-startTile.y+1;
 						if (length == 1) {
-							if (wc.world.getTileAt(x+1, y).type.Contains("wall") == false && wc.world.getTileAt(x-1, y).type.Contains("wall") == false) {
+							if (wc.world.getTileAt(x+1, y).type.Contains("wall") == false &&
+								wc.world.getTileAt(x-1, y).type.Contains("wall") == false) {
 								createBoxCollider(
 									new Vector2(startTile.x+0.5f, ((startTile.y+currTile.y)/2f)+0.5f),
 									new Vector2(1f, length),
@@ -195,23 +211,25 @@ public class MapSpriteController : MonoBehaviour {
 	}
 
 	void createBoxCollider(Vector2 position, Vector2 size, Vector2 offset) {
-		GameObject go = new GameObject("BoxCollider");
-		go.transform.position = position;
-		go.transform.SetParent(this.transform);
-
-		BoxCollider2D box = go.AddComponent<BoxCollider2D>();
+		GameObject go = SimplePool.Spawn(
+			boxColliderPrefab, 
+			this.transform, 
+			position, 
+			Quaternion.identity
+		);
+		BoxCollider2D box = go.GetComponent<BoxCollider2D>();
 		box.size = size;
 		box.offset = offset;
 
-		wallBoxCollidersGOs.Add(go);
+ 		wallBoxCollidersGOs.Add(go);
 	}
 
 	void removeBoxColliders() {
 		if (wallBoxCollidersGOs.Count > 0) {
 			foreach (var box in wallBoxCollidersGOs) {
-				Destroy(box);
+				SimplePool.Despawn(box);
 			}
-			//wallBoxCollidersGOs = null;
+			wallBoxCollidersGOs = new List<GameObject>();
 		}
 	}
 }

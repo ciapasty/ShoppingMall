@@ -24,6 +24,9 @@ public class Tile {
 		}
 	}
 
+	public Area area { get; protected set; }
+	public Shelf shelf { get; protected set; }
+
 	public float movementCost { 
 		get {
 			if (type.Contains("floor")) {
@@ -45,7 +48,7 @@ public class Tile {
 			return (movementCost > 0);
 		}
 	}
-
+		
 	public bool hasPendingJob = false;
 	public bool hasSupply = false;
 	public bool isBuildable {
@@ -103,6 +106,12 @@ public class Tile {
 
 		return ns;
 	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	// ===== Callbacks =====
 
 	public void registerTileChangedCallback(Action<Tile> callback) {
 		cbTileChanged += callback;

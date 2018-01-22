@@ -9,6 +9,8 @@ public class BuildModeController : MonoBehaviour {
 	public bool isBuildModeEnabled { get; protected set; }
 	public string buildType { get; protected set; }
 
+	public GameObject placeholderPrefab;
+
 	Dictionary<Job, GameObject> jobBuildPlaceholderGraphics;
 	Dictionary<Tile, Job> pendingJobs;
 	Dictionary<Tile, GameObject> buildPlaceholderGraphics;
@@ -26,9 +28,7 @@ public class BuildModeController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
-	}
+	void Update () {}
 
 	public void startBuildModeWith(string type) {
 		isBuildModeEnabled = true;
@@ -65,14 +65,14 @@ public class BuildModeController : MonoBehaviour {
 				}
 			}
 			if (job != null) {
-				wc.world.jobQueue.enqueue(job);
+				wc.world.buildJobQueue.enqueue(job);
 				jobBuildPlaceholderGraphics.Add(job, buildPlaceholderGraphics[job.tile]);
 				pendingJobs.Add(tile, job);
 				tile.hasPendingJob = true;
 			}
 		}
 		foreach (var go in trash) {
-			Destroy(go);
+			SimplePool.Despawn(go);
 		}
 		buildPlaceholderGraphics = new Dictionary<Tile, GameObject>();
 	}
@@ -83,7 +83,7 @@ public class BuildModeController : MonoBehaviour {
 		pendingJobs.Remove(job.tile);
 		GameObject jobGO = jobBuildPlaceholderGraphics[job];
 		jobBuildPlaceholderGraphics.Remove(job);
-		Destroy(jobGO);
+		SimplePool.Despawn(jobGO);
 	}
 
 	void buildJobCancelled(Job job) {
@@ -91,7 +91,7 @@ public class BuildModeController : MonoBehaviour {
 		pendingJobs.Remove(job.tile);
 		GameObject jobGO = jobBuildPlaceholderGraphics[job];
 		jobBuildPlaceholderGraphics.Remove(job);
-		Destroy(jobGO);
+		SimplePool.Despawn(jobGO);
 	}
 
 	void demolishJobFinished(Job job) {
@@ -100,7 +100,7 @@ public class BuildModeController : MonoBehaviour {
 		pendingJobs.Remove(job.tile);
 		GameObject jobGO = jobBuildPlaceholderGraphics[job];
 		jobBuildPlaceholderGraphics.Remove(job);
-		Destroy(jobGO);
+		SimplePool.Despawn(jobGO);
 	}
 
 	// ===== Placeholder Graphics =====
@@ -112,9 +112,13 @@ public class BuildModeController : MonoBehaviour {
 		}
 	}
 
+	public void interruptDragging() {
+		clearPlaceholderGraphics();
+	}
+
 	void clearPlaceholderGraphics() {
 		foreach (var go in buildPlaceholderGraphics.Values) {
-			Destroy(go);
+			SimplePool.Despawn(go);
 		}
 		buildPlaceholderGraphics = new Dictionary<Tile, GameObject>();
 	}
@@ -142,28 +146,38 @@ public class BuildModeController : MonoBehaviour {
 				for (int x = start_x; x <= end_x; x++) {
 					for (int y = start_y; y <= end_y; y++) {
 						if (x == start_x || x == end_x || y == start_y || y == end_y) {
-							buildPlaceholderGraphics.Add(wc.world.getTileAt(x, y), createPlaceholderGraphic(wc.world.getTileAt(x,y)));
+							buildPlaceholderGraphics.Add(
+								wc.world.getTileAt(x, y), 
+								createPlaceholderGraphic(wc.world.getTileAt(x,y))
+							);
 						}
 					}
 				}
 			} else {
 				for (int x = start_x; x <= end_x; x++) {
 					for (int y = start_y; y <= end_y; y++) {
-						buildPlaceholderGraphics.Add(wc.world.getTileAt(x, y), createPlaceholderGraphic(wc.world.getTileAt(x,y)));
+						buildPlaceholderGraphics.Add(
+							wc.world.getTileAt(x, y), 
+							createPlaceholderGraphic(wc.world.getTileAt(x,y))
+						);
 					}
 				}
 			}
 		} else {
-			buildPlaceholderGraphics = new Dictionary<Tile, GameObject> {{start, createPlaceholderGraphic(start)}};
+			buildPlaceholderGraphics = new Dictionary<Tile, GameObject> {
+				{start, createPlaceholderGraphic(start)}
+			};
 		}
 	}
 
 	GameObject createPlaceholderGraphic(Tile tile) {
-		GameObject tempGO = new GameObject();
-		tempGO.transform.parent = transform;
-		tempGO.transform.position = new Vector3(tile.x+0.5f, tile.y+0.5f, 0);
-
-		SpriteRenderer tempSR = tempGO.AddComponent<SpriteRenderer>();
+		GameObject tempGO = SimplePool.Spawn(
+			placeholderPrefab, 
+			this.transform, 
+			new Vector3(tile.x+0.5f, tile.y+0.5f, 0), 
+			Quaternion.identity
+		);
+		SpriteRenderer tempSR = tempGO.GetComponent<SpriteRenderer>();
 		if (buildType != "") {
 			tempSR.sprite = Resources.Load<Sprite>("sprites/tiles/"+buildType);
 		} else {

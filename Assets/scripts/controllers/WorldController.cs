@@ -9,13 +9,13 @@ public class WorldController : MonoBehaviour {
 	public int width = 100;
 	public int height = 100;
 
-	Dictionary<Character, GameObject> characters;
+	Dictionary<Worker, GameObject> characters;
 	Dictionary<Supply, GameObject> supplyGameObjects;
 
 	float deliveryTimer = 3f;
 
 	void OnEnable() {
-		characters = new Dictionary<Character, GameObject>();
+		characters = new Dictionary<Worker, GameObject>();
 		supplyGameObjects = new Dictionary<Supply, GameObject>();
 
 		if(Instance != null) {
@@ -51,7 +51,7 @@ public class WorldController : MonoBehaviour {
 		FindObjectOfType<MapSpriteController>().updateTileGraphics(tile);
 	}
 
-	void onCharacterSpawned(Character c) {
+	void onCharacterSpawned(Worker c) {
 		// TEMP
 		string prefab = "prefabs/worker_"+Random.Range(1,3);
 //		if (c.weight > 90) {
@@ -71,8 +71,8 @@ public class WorldController : MonoBehaviour {
 
 	// TEMP box spawn
 	void deliverSupplies() {
-		if (world.jobQueue.pendingJobs.Count > 0) {
-			foreach (var job in world.jobQueue.pendingJobs.ToArray()) {
+		if (world.buildJobQueue.pendingJobs.Count > 0) {
+			foreach (var job in world.buildJobQueue.pendingJobs.ToArray()) {
 				if (job.supply != null) {
 					Tile tile = world.getEmptyTile();
 
@@ -90,20 +90,20 @@ public class WorldController : MonoBehaviour {
 		}
 	}
 
-	void pickupSupply(Character c) {
+	void pickupSupply(Worker c) {
 		GameObject supGO = supplyGameObjects[c.job.supply];
 		supGO.transform.SetParent(characters[c].transform);
 		supGO.transform.localPosition = new Vector3(0, 0.45f, 0);
 		supGO.GetComponent<SpriteRenderer>().sortingOrder = 1;
 	}
 
-	void supplyUsed(Character c) {
+	void supplyUsed(Worker c) {
 		GameObject supGO = supplyGameObjects[c.job.supply];
 		supplyGameObjects.Remove(c.job.supply);
 		Destroy(supGO);
 	}
 
-	void dropSupply(Character c) {
+	void dropSupply(Worker c) {
 		GameObject supGO = supplyGameObjects[c.job.supply];
 		supGO.transform.SetParent(this.transform);
 		supGO.transform.position = new Vector3(c.currTile.x+0.5f, c.currTile.y+0.5f, 0);

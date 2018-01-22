@@ -70,14 +70,14 @@ public static class SimplePool {
 		}
 		
 		// Spawn an object from our pool
-		public GameObject Spawn(Vector3 pos, Quaternion rot) {
+		public GameObject Spawn(Transform parent, Vector3 pos, Quaternion rot) {
 			GameObject obj;
 			if(inactive.Count==0) {
 				// We don't have an object in our pool, so we
 				// instantiate a whole new object.
 				obj = (GameObject)GameObject.Instantiate(prefab, pos, rot);
 				obj.name = prefab.name + " ("+(nextId++)+")";
-				
+
 				// Add a PoolMember component so we know what pool
 				// we belong to.
 				obj.AddComponent<PoolMember>().myPool = this;
@@ -95,12 +95,13 @@ public static class SimplePool {
 					//	   if you really don't want this.
 					// No worries -- we'll just try the next one in our sequence.
 					
-					return Spawn(pos, rot);
+					return Spawn(parent, pos, rot);
 				}
 			}
 			
 			obj.transform.position = pos;
 			obj.transform.rotation = rot;
+			obj.transform.SetParent(parent);
 			obj.SetActive(true);
 			return obj;
 			
@@ -152,13 +153,13 @@ public static class SimplePool {
 	/// Spawn/Despawn sequence is going to be pretty darn quick and
 	/// this avoids code duplication.
 	/// </summary>
-	static public void Preload(GameObject prefab, int qty = 1) {
+	static public void Preload(GameObject prefab, Transform parent, int qty = 1) {
 		Init(prefab, qty);
 		
 		// Make an array to grab the objects we're about to pre-spawn.
 		GameObject[] obs = new GameObject[qty];
 		for (int i = 0; i < qty; i++) {
-			obs[i] = Spawn (prefab, Vector3.zero, Quaternion.identity);
+			obs[i] = Spawn (prefab, parent, Vector3.zero, Quaternion.identity);
 		}
 		
 		// Now despawn them all.
@@ -174,10 +175,10 @@ public static class SimplePool {
 	/// after spawning -- but remember that toggling IsActive will also
 	/// call that function.
 	/// </summary>
-	static public GameObject Spawn(GameObject prefab, Vector3 pos, Quaternion rot) {
+	static public GameObject Spawn(GameObject prefab, Transform parent, Vector3 pos, Quaternion rot) {
 		Init(prefab);
 		
-		return pools[prefab].Spawn(pos, rot);
+		return pools[prefab].Spawn(parent, pos, rot);
 	}
 	
 	/// <summary>

@@ -6,6 +6,7 @@ public class MenuSelector : MonoBehaviour {
 
 	public GameObject buttonPrefab;
 	public GameObject subMenu;
+	UnityEngine.UI.Button areaButton;
 	UnityEngine.UI.Button buildButton;
 	UnityEngine.UI.Button demolishButton;
 
@@ -13,13 +14,16 @@ public class MenuSelector : MonoBehaviour {
 
 	bool subMenuVisible = false;
 	List<GameObject> buildTypeButtons;
+	List<GameObject> areaTypeButtons;
 
 	// Use this for initialization
 	void Start () {
 		bmc = FindObjectOfType<BuildModeController>();
+		areaButton = transform.Find("AreaButton").GetComponent<UnityEngine.UI.Button>();
 		buildButton = transform.Find("BuildButton").GetComponent<UnityEngine.UI.Button>();
 		demolishButton = transform.Find("DemolishButton").GetComponent<UnityEngine.UI.Button>();
 
+		areaButton.onClick.AddListener(areaButtonClick);
 		buildButton.onClick.AddListener(buildButtonClick);
 		demolishButton.onClick.AddListener(() => buildTypeButtonClick("demolish"));
 
@@ -43,13 +47,22 @@ public class MenuSelector : MonoBehaviour {
 		}
 	}
 
+	void areaButtonClick() {
+		
+	}
+
 	void spawnBuildButtons() {
 		foreach (var buildType in bmc.buildTypes) {
-			GameObject buttGO = SimplePool.Spawn(buttonPrefab, Vector3.zero, Quaternion.identity);
-			buttGO.name = buildType;
+			GameObject buttGO = SimplePool.Spawn(
+				buttonPrefab, 
+				subMenu.transform, 
+				Vector3.zero, 
+				Quaternion.identity
+			);
 			buttGO.transform.GetChild(0).GetComponentInChildren<UnityEngine.UI.Image>().sprite = Resources.Load<Sprite>("sprites/tiles/"+buildType);
-			buttGO.transform.SetParent(subMenu.transform);
-			buttGO.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => buildTypeButtonClick(buildType));
+			buttGO.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+				() => buildTypeButtonClick(buildType)
+			);
 
 			buildTypeButtons.Add(buttGO);
 		}

@@ -13,6 +13,7 @@ public class MouseController : MonoBehaviour {
 	Vector3 dragEndPosition;
 
 	BuildModeController bmc;
+	bool hasInterrupted = false;
 
 	// Use this for initialization
 	void Start () {
@@ -50,15 +51,29 @@ public class MouseController : MonoBehaviour {
 				}
 
 				if (Input.GetMouseButton(0)) {
-					dragEndPosition = currFramePosition;
-					bmc.updatePlaceholderGraphics(wc.world.getTileAtPosition(dragStartPosition), wc.world.getTileAtPosition(dragEndPosition));
-					if (Input.GetMouseButtonDown(1))
-						cancelActions();
+					if (hasInterrupted == false) {
+						dragEndPosition = currFramePosition;
+						bmc.updatePlaceholderGraphics(
+							wc.world.getTileAtPosition(dragStartPosition), 
+							wc.world.getTileAtPosition(dragEndPosition)
+						);
+						if (Input.GetMouseButtonDown(1)) {
+							bmc.interruptDragging();
+							hasInterrupted = true;
+						}
+					}
 				}
 
 				if (Input.GetMouseButtonUp(0)) {
-					bmc.updatePlaceholderGraphics(wc.world.getTileAtPosition(dragStartPosition), wc.world.getTileAtPosition(dragEndPosition));
-					bmc.doBuild();
+					if (hasInterrupted == false) {
+						bmc.updatePlaceholderGraphics(
+							wc.world.getTileAtPosition(dragStartPosition), 
+							wc.world.getTileAtPosition(dragEndPosition)
+						);
+						bmc.doBuild();
+					} else {
+						hasInterrupted = false;
+					}
 				}
 			}
 		}
@@ -77,7 +92,11 @@ public class MouseController : MonoBehaviour {
 			Camera.main.transform.Translate( diff );
 		}
 		Camera.main.orthographicSize -= Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
-		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 3f, Mathf.Max(WorldController.Instance.world.height, WorldController.Instance.world.height));
+		Camera.main.orthographicSize = Mathf.Clamp(
+			Camera.main.orthographicSize, 
+			3f, 
+			Mathf.Max(WorldController.Instance.world.height, WorldController.Instance.world.height)
+		);
 	}
 
 	GameObject createTempGraphic() {
@@ -122,7 +141,7 @@ public class MouseController : MonoBehaviour {
 
 		// DEBUG -> Spawn new character
 		if (Input.GetKeyDown(KeyCode.C)) {
-			wc.world.spawnCharacter(new Character(Random.Range(50, 80), overTile));
+			wc.world.spawnCharacter(new Worker(Random.Range(50, 80), overTile));
 		}
 	}
 }
