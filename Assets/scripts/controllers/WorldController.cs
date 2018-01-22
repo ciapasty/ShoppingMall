@@ -5,18 +5,23 @@ using UnityEngine;
 public class WorldController : MonoBehaviour {
 
 	public static WorldController Instance { get; protected set; }
+	public World world { get; protected set; }
 
 	public int width = 100;
 	public int height = 100;
 
 	Dictionary<Worker, GameObject> characters;
 	Dictionary<Supply, GameObject> supplyGameObjects;
+	Dictionary<Shelf, GameObject> shelfGameObjects;
+	Dictionary<Area, GameObject> areaGameObjects;
 
 	float deliveryTimer = 3f;
 
 	void OnEnable() {
 		characters = new Dictionary<Worker, GameObject>();
 		supplyGameObjects = new Dictionary<Supply, GameObject>();
+		shelfGameObjects = new Dictionary<Shelf, GameObject>();
+		areaGameObjects = new Dictionary<Area, GameObject>();
 
 		if(Instance != null) {
 			Debug.LogError("There should never be two world controllers.");
@@ -25,14 +30,17 @@ public class WorldController : MonoBehaviour {
 
 		world = new World(width, height);
 		world.registerTileChangedCallback(onTileChanged);
+		world.registerTileAreaChangedCallback(onTileAreaChanged);
 		world.registerCharacterSpawnedCallback(onCharacterSpawned);
 	}
-
-	public World world { get; protected set; }
-
+		
 	// Use this for initialization
 	void Start () {
-		Camera.main.transform.position = new Vector3(world.width/2, world.height/2, Camera.main.transform.position.z);
+		Camera.main.transform.position = new Vector3(
+			world.width/2, 
+			world.height/2, 
+			Camera.main.transform.position.z
+		);
 	}
 	
 	// Update is called once per frame
@@ -49,6 +57,10 @@ public class WorldController : MonoBehaviour {
 
 	void onTileChanged(Tile tile) {
 		FindObjectOfType<MapSpriteController>().updateTileGraphics(tile);
+	}
+
+	void onTileAreaChanged(Tile tile) {
+		FindObjectOfType<AreaSpriteController>().updateAreaTileGraphics(tile);
 	}
 
 	void onCharacterSpawned(Worker c) {
@@ -69,7 +81,7 @@ public class WorldController : MonoBehaviour {
 		characters.Add(c, charGO);
 	}
 
-	// TEMP box spawn
+	// TEMP box spawn -> move to SupplyManager
 	void deliverSupplies() {
 		if (world.buildJobQueue.pendingJobs.Count > 0) {
 			foreach (var job in world.buildJobQueue.pendingJobs.ToArray()) {
@@ -108,5 +120,18 @@ public class WorldController : MonoBehaviour {
 		supGO.transform.SetParent(this.transform);
 		supGO.transform.position = new Vector3(c.currTile.x+0.5f, c.currTile.y+0.5f, 0);
 		c.job.supply.setTile(c.currTile);
+	}
+
+	// TEMP create random area
+	public void createArea(Tile tile) {
+		Area area = new Area("area", new Color(
+			UnityEngine.Random.Range(0f, 1f),
+			UnityEngine.Random.Range(0f, 1f),
+			UnityEngine.Random.Range(0f, 1f),
+			0.2f
+		));
+		world.areas.Add(area);
+
+		tile.setArea(area);
 	}
 }

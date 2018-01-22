@@ -19,6 +19,7 @@ public class World {
 	public JobQueue staffJobQueue;
 
 	Action<Tile> cbTileChanged;
+	Action<Tile> cbTileAreaChanged;
 	Action<Worker> cbCharacterSpawned;
 
 	public World(int width, int height) {
@@ -37,7 +38,8 @@ public class World {
 					type = "floor_basic";
 				}
 				Tile tile = new Tile(this, x, y, type);
-				tile.registerTileChangedCallback(OnTileChanged);
+				tile.registerChangedCallback(OnTileChanged);
+				tile.registerAreaChangedCallback(OnTileAreaChanged);
 				tileMap[x,y] = tile;
 			}
 		}
@@ -66,18 +68,15 @@ public class World {
 	}
 
 	void OnTileChanged(Tile tile) {
-		if (cbTileChanged != null) {
+		if (cbTileChanged != null)
 			cbTileChanged(tile);
-		}
 
 		invalidateTileGraph();
 	}
 
-	public void spawnCharacter(Worker c) {
-		chars.Add(c);
-
-		if (cbCharacterSpawned != null)
-			cbCharacterSpawned(c);
+	void OnTileAreaChanged(Tile tile) {
+		if (cbTileAreaChanged != null)
+			cbTileAreaChanged(tile);
 	}
 
 	public Tile getEmptyTile() {
@@ -91,6 +90,14 @@ public class World {
 		return tile;
 	}
 
+	// DEBUG
+	public void spawnWorker(Worker c) {
+		chars.Add(c);
+
+		if (cbCharacterSpawned != null)
+			cbCharacterSpawned(c);
+	}
+
 	// ===== Callbacks =====
 
 	public void registerTileChangedCallback(Action<Tile> callback) {
@@ -101,6 +108,14 @@ public class World {
 		cbTileChanged -= callback;
 	}
 
+	public void registerTileAreaChangedCallback(Action<Tile> callback) {
+		cbTileAreaChanged += callback;
+	}
+
+	public void unregisterTileAreaChangedCallback(Action<Tile> callback) {
+		cbTileAreaChanged -= callback;
+	}
+
 	public void registerCharacterSpawnedCallback(Action<Worker> callback) {
 		cbCharacterSpawned += callback;
 	}
@@ -108,4 +123,5 @@ public class World {
 	public void unregisterCharacterSpawnedCallback(Action<Worker> callback) {
 		cbCharacterSpawned -= callback;
 	}
+
 }

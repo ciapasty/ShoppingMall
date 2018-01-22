@@ -17,6 +17,7 @@ public class BuildModeController : MonoBehaviour {
 
 	// TEMP -> loaded from file??
 	public string[] buildTypes = {"wall_basic", "wall_fancy", "floor_basic", "floor_fancy"};
+	public string[] areaTypes = { "storage", "fruit", "vegetables", "sweets" };
 
 	// Use this for initialization
 	void Start () {

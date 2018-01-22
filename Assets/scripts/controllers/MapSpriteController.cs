@@ -56,8 +56,8 @@ public class MapSpriteController : MonoBehaviour {
 		SpriteRenderer sr = mapGo.AddComponent<SpriteRenderer>();
 		sr.material = spriteDiffuseMaterial;
 		sr.sprite = sp;
-//		sr.sortingLayerName = layerName;
-		sr.sortingOrder = -1;
+		//sr.sortingLayerName = layerName;
+		sr.sortingOrder = -2;
 	}
 
 	void drawTile(Tile tile) {

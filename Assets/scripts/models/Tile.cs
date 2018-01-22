@@ -19,8 +19,8 @@ public class Tile {
 			string oldType = _type;
 			_type = value;
 
-			if (cbTileChanged != null && oldType != value)
-				cbTileChanged(this);
+			if (cbChanged != null && oldType != value)
+				cbChanged(this);
 		}
 	}
 
@@ -57,7 +57,8 @@ public class Tile {
 		}
 	}
 
-	Action<Tile> cbTileChanged;
+	Action<Tile> cbChanged;
+	Action<Tile> cbAreaChanged;
 
 	public Tile(World world, int x, int y, string type) {
 		this.world = world;
@@ -109,16 +110,25 @@ public class Tile {
 
 	public void setArea(Area area) {
 		this.area = area;
+		cbAreaChanged(this);
 	}
 
 	// ===== Callbacks =====
 
-	public void registerTileChangedCallback(Action<Tile> callback) {
-		cbTileChanged += callback;
+	public void registerChangedCallback(Action<Tile> callback) {
+		cbChanged += callback;
 	}
 
-	public void unregisterTileChangedCallback(Action<Tile> callback) {
-		cbTileChanged -= callback;
+	public void unregisterChangedCallback(Action<Tile> callback) {
+		cbChanged -= callback;
+	}
+
+	public void registerAreaChangedCallback(Action<Tile> callback) {
+		cbAreaChanged += callback;
+	}
+
+	public void unregisterAreaChangedCallback(Action<Tile> callback) {
+		cbAreaChanged -= callback;
 	}
 
 //	// Get tiles in diff world directions

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +14,8 @@ public class MenuSelector : MonoBehaviour {
 	BuildModeController bmc;
 
 	bool subMenuVisible = false;
-	List<GameObject> buildTypeButtons;
-	List<GameObject> areaTypeButtons;
+	string currSubMenuType = "";
+	List<GameObject> subMenuButtons;
 
 	// Use this for initialization
 	void Start () {
@@ -25,59 +26,69 @@ public class MenuSelector : MonoBehaviour {
 
 		areaButton.onClick.AddListener(areaButtonClick);
 		buildButton.onClick.AddListener(buildButtonClick);
-		demolishButton.onClick.AddListener(() => buildTypeButtonClick("demolish"));
+		demolishButton.onClick.AddListener(() => buildSubButtonClick("demolish"));
 
-		buildTypeButtons = new List<GameObject>();
+		subMenuButtons = new List<GameObject>();
 	}
-	
-	// Update is called once per frame
-	void Update () {}
 
 	void buildButtonClick() {
-		if (subMenuVisible == false) {
-			spawnBuildButtons();
-
-			buildButton.image.sprite = buildButton.spriteState.pressedSprite;
-			subMenuVisible = true;
-		} else {
-			removeBuildButtons();
-
-			subMenuVisible = false;
-			bmc.cancelBuildMode();
-		}
+		showSubMenuFor("tiles", bmc.buildTypes, buildSubButtonClick);
 	}
 
 	void areaButtonClick() {
+		showSubMenuFor("areas", bmc.areaTypes, areaSubButtonClick);
+	}
+
+	void showSubMenuFor(string type, string[] buttonTypes, Action<string> onClick) {
+		if (subMenuVisible == false) {
+			spawnSubButtons(type, buttonTypes, onClick);
+			currSubMenuType = type;
+			subMenuVisible = true;
+		} else {
+			removeSubButtons();
+			bmc.cancelBuildMode();
+			if (type != currSubMenuType) {
+				spawnSubButtons(type, buttonTypes, onClick);
+				currSubMenuType = type;
+			} else {
+				subMenuVisible = false;
+				currSubMenuType = "";
+			}
+		}
+	}
+
+	void spawnSubButtons(string type, string[] buttonTypes, Action<string> onClick) {
+		foreach (var subType in buttonTypes) {
+			GameObject buttGO = Instantiate(
+				buttonPrefab, 
+				Vector3.zero, 
+				Quaternion.identity,
+				subMenu.transform
+			);
+			buttGO.transform.GetChild(0).GetComponentInChildren<UnityEngine.UI.Image>().sprite = 
+				Resources.Load<Sprite>("sprites/"+type+"/"+subType);
+			buttGO.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+				() => onClick(subType)
+			);
+
+			subMenuButtons.Add(buttGO);
+		}
+	}
+
+	void removeSubButtons() {
+		foreach (var button in subMenuButtons) {
+			Destroy(button);
+		}
+		subMenuButtons = new List<GameObject>();
+	}
+
+	void areaSubButtonClick(string areaType) {
 		
 	}
 
-	void spawnBuildButtons() {
-		foreach (var buildType in bmc.buildTypes) {
-			GameObject buttGO = SimplePool.Spawn(
-				buttonPrefab, 
-				subMenu.transform, 
-				Vector3.zero, 
-				Quaternion.identity
-			);
-			buttGO.transform.GetChild(0).GetComponentInChildren<UnityEngine.UI.Image>().sprite = Resources.Load<Sprite>("sprites/tiles/"+buildType);
-			buttGO.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
-				() => buildTypeButtonClick(buildType)
-			);
-
-			buildTypeButtons.Add(buttGO);
-		}
-	}
-
-	void removeBuildButtons() {
-		foreach (var button in buildTypeButtons) {
-			SimplePool.Despawn(button);
-		}
-		buildTypeButtons = new List<GameObject>();
-	}
-
-	void buildTypeButtonClick(string buildType) {
+	void buildSubButtonClick(string buildType) {
 		if (buildType == "demolish") {
-			removeBuildButtons();
+			removeSubButtons();
 
 			subMenuVisible = false;
 		}
